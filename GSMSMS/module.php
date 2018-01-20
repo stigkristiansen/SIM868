@@ -58,17 +58,26 @@ class SIM868GsmSms extends IPSModule
     }
 	
 	Public function SendCommand(string $Command) {
+		if (!$this->Lock("ReceivedLock")) 
+			SetValueString($this->GetIDForIdent('Buffer'), '');
+		else
+			return false;
+		
+		$this->Unlock("ReceivedLock");
 		
 		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
+		return WaitForResponse(500);
 	}
 	
 	private function WaitForResponse ($Timeout) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
+		$idBuffer = $this->GetIDForIdent('buffer');
+		
 		$response=""; 
 		$iteration = intdiv($Timeout, 100);
  		for($x=0;$x<$iteration;$x++) { 
- 			$response = GetValueString($this->GetIDForIdent('buffer')); 
+ 			$response = GetValueString($idBuffer); 
  			 
  			if(strlen($response)>0) { 
  				$log->LogMessage("Response from gateway: ".$response); 

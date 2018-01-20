@@ -83,9 +83,7 @@ class SIM868Gateway extends IPSModule
 		SetValueString($idBuffer, $buffer);
 		
 		$this->Unlock("ReceivedLock"); 
-		
-		
-		
+				
 		return true;
     }
 	
