@@ -33,7 +33,7 @@ class SIM868Gateway extends IPSModule
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Received data from child"); 
 		
-		SendCommand($incomingBuffer);
+		$this->SendCommand($incomingBuffer);
 	}
 	
     public function ReceiveData($JSONString) {
