@@ -26,12 +26,22 @@ class SIM868Gateway extends IPSModule
 		IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
     }
 
+	public function ForwardData ($JSONString) {
+		$incomingData = json_decode($JSONString);
+		$incomingBuffer = utf8_decode($incomingData->Buffer);
+		
+		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
+		$log->LogMessage("Received data from child"); 
+		
+		SendCommand($incomingBuffer);
+	}
+	
     public function ReceiveData($JSONString) {
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
 				
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
-		$log->LogMessage("Received data"); 
+		$log->LogMessage("Received data from parent"); 
 		
 		$idBuffer = $this->GetIDForIdent('Buffer');
 		$buffer = GetValueString($idBuffer);
@@ -55,7 +65,7 @@ class SIM868Gateway extends IPSModule
 		
 		if($pos === $length) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
-			$buffer = preg_replace("/\s+/", " ", $buffer);
+			$buffer = trim(preg_replace("/\s+/", " ", $buffer));
 			
 			$log->LogMessage("Found a complete messge: ".$buffer);
 						

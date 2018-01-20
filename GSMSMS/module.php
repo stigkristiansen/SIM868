@@ -8,7 +8,7 @@ class SIM868GsmSms extends IPSModule
     public function Create()
     {
         parent::Create();
-        //$this->RequireParent("{B969177D-4A13-40FB-8006-3BF7557FA5F6}");
+        $this->RequireParent("{B969177D-4A13-40FB-8006-3BF7557FA5F6}");
         
         $this->RegisterPropertyBoolean ("log", true);
 		
@@ -34,8 +34,7 @@ class SIM868GsmSms extends IPSModule
 		$log->LogMessage("Received data: ".$incomingBuffer); 
 		
 		$idBuffer = $this->GetIDForIdent('Buffer');
-		$buffer = GetValueString($idBuffer);
-		$buffer .= $incomingBuffer;
+		$buffer = $incomingBuffer;
 		
 		if (!$this->Lock("ReceivedLock")) { 
 			$log->LogMessage("Buffer is already locked. Aborting message handling!"); 
@@ -43,24 +42,45 @@ class SIM868GsmSms extends IPSModule
 		} else
 			$log->LogMessage("Buffer is locked");
 		
-		// AT+CMGR=1  +CMGR: 1,"",32 06917429000191240A91745960544300008110510233034010E4329D5E0695E5A0B21B442FCFE9 OK 
+		// AT+CMGR=1 +CMGR: 1,"",32 06917429000191240A91745960544300008110510233034010E4329D5E0695E5A0B21B442FCFE9 OK 
 		
 		
 		//
 		// Handle incoming data
 		//
 		
-		SetValueString($idBuffer, $buffer);
-		
-		
+		SetValueString($this->GetIDForIdent('LastReceived'), $buffer);
+		SetValueString($this->GetIDForIdent('Buffer'), $buffer);
 		
 		$this->Unlock("ReceivedLock"); 
 		
-		SetValueString($idBuffer, $buffer);
-
 		return true;
     }
 	
+	Public SendCommand($Command) {
+		
+		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
+	}
+	
+	private function WaitForResponse ($Timeout) {
+		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
+		
+		$response=""; 
+		$iteration = intdiv($Timeout, 100);
+ 		for($x=0;$x<$iteration;$x++) { 
+ 			$response = GetValueString($this->GetIDForIdent('buffer')); 
+ 			 
+ 			if(strlen($response)>0) { 
+ 				$log->LogMessage("Response from gateway: ".$response); 
+ 				return true; 
+ 			} else 
+ 				$log->LogMessage("Still waiting..."); 
+ 				 
+ 			IPS_Sleep(100); 
+ 		} 
+
+		return false;
+	}
 	
 	private function Lock($ident){
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
