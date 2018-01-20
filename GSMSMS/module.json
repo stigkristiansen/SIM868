@@ -1,0 +1,14 @@
+{ 
+    "id" :  "{E318444C-B16B-412F-BCBB-D74A24B4669A}" , 
+    "name" :  "SIM868GsmSms" , 
+    "type" :  3 , 
+    "vendor" :  "Stig Kristiansen" , 
+    "aliases" : 
+    [ 
+        "SIM868 GSM SMS "  
+    ] ,   
+    "parentRequirements" :  ["{51C4B053-9596-46BE-A143-E3086636E782}"] , 
+    "childRequirements" :  [] , 
+    "implemented" :  ["{27E8784A-DF07-4142-9C77-281BF411EEB7}"] , 
+    "prefix" :  "GSMS" 
+}
