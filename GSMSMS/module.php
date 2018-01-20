@@ -43,11 +43,16 @@ class SIM868GsmSms extends IPSModule
 		} else
 			$log->LogMessage("Buffer is locked");
 		
+		// AT+CMGR=1  +CMGR: 1,"",32 06917429000191240A91745960544300008110510233034010E4329D5E0695E5A0B21B442FCFE9 OK 
+		
+		
 		//
 		// Handle incoming data
 		//
 		
 		SetValueString($idBuffer, $buffer);
+		
+		
 		
 		$this->Unlock("ReceivedLock"); 
 		

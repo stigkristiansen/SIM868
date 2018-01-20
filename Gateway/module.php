@@ -55,6 +55,7 @@ class SIM868Gateway extends IPSModule
 		
 		if($pos === $length) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
+			$buffer = preg_replace("/\s+/", " ", $buffer);
 			
 			$log->LogMessage("Found a complete messge: ".$buffer);
 						
