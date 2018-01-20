@@ -73,10 +73,10 @@ class SIM868GsmSms extends IPSModule
 	private function WaitForResponse ($Timeout) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		$idBuffer = $this->GetIDForIdent('buffer');
+		$idBuffer = $this->GetIDForIdent('Buffer');
 		
 		$response=""; 
-		$iteration = intdiv($Timeout, 100);
+		$iteration = intval($Timeout/100);
  		for($x=0;$x<$iteration;$x++) { 
  			$response = GetValueString($idBuffer); 
  			 
