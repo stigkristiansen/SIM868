@@ -58,7 +58,7 @@ class SIM868GsmSms extends IPSModule
     }
 	
 	Public function SendCommand(string $Command) {
-		if (!$this->Lock("ReceivedLock")) 
+		if ($this->Lock("ReceivedLock")) 
 			SetValueString($this->GetIDForIdent('Buffer'), '');
 		else
 			return false;
