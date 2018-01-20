@@ -57,7 +57,7 @@ class SIM868GsmSms extends IPSModule
 		return true;
     }
 	
-	Public SendCommand($Command) {
+	Public function SendCommand($Command) {
 		
 		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	}
