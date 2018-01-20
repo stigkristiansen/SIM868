@@ -60,10 +60,6 @@ class SIM868GsmSms extends IPSModule
 	Public function SendCommand(string $Command) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		$instance = IPS_GetInstance($this->InstanceID);
-        $parentGUID = IPS_GetInstance($instance['ConnectionID'])['ModuleInfo']['ModuleID'];
-		$log->LogMessage("The parent GUID is ".$parentGUID);
-		
 		if ($this->Lock("ReceivedLock")) 
 			SetValueString($this->GetIDForIdent('Buffer'), '');
 		else
@@ -142,16 +138,13 @@ class SIM868GsmSms extends IPSModule
 	private function EvaluateParent() {
     	$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		if($this->HasActiveParent()) {
-            $instance = IPS_GetInstance($this->InstanceID);
-            $parentGUID = IPS_GetInstance($instance['ConnectionID'])['ModuleInfo']['ModuleID'];
-            if ($parentGUID == '{6DC3D946-0D31-450F-A8C6-C42DB8D7D4F1}') {
-				$log->LogMessage("The parent I/O port is active and supported");
-				return true;
-			} else
-				$log->LogMessageError("The parent I/O port is not supported");
+		$instance = IPS_GetInstance($this->InstanceID);
+		$parentGUID = IPS_GetInstance($instance['ConnectionID'])['ModuleInfo']['ModuleID'];
+		if ($parentGUID == '{B969177D-4A13-40FB-8006-3BF7557FA5F6}') {
+			$log->LogMessage("The parent is supported");
+			return true;
 		} else
-			$log->LogMessageError("The parent I/O port is not active.");
+			$log->LogMessageError("The parent is not supported");
 		
 		return false;
 	}
