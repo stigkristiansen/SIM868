@@ -62,7 +62,7 @@ class SIM868GsmSms extends IPSModule
 		
 		$instance = IPS_GetInstance($this->InstanceID);
         $parentGUID = IPS_GetInstance($instance['ConnectionID'])['ModuleInfo']['ModuleID'];
-		$log->LogMessage("The parent GUID is " $parentGUID);
+		$log->LogMessage("The parent GUID is ".$parentGUID);
 		
 		if ($this->Lock("ReceivedLock")) 
 			SetValueString($this->GetIDForIdent('Buffer'), '');
