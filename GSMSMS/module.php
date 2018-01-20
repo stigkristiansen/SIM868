@@ -70,7 +70,7 @@ class SIM868GsmSms extends IPSModule
 		$log->LogMessage("Sending command to parent gateway and waiting for response...");
 		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	
-		if($this->WaitForResponse(500)) {
+		if($this->WaitForResponse(5000)) {
 			$log->LogMessage("Got response back from parent gateway");
 			return true;
 		} else {
