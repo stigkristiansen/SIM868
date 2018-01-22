@@ -63,7 +63,7 @@ class SIM868Gateway extends IPSModule
 				break;
 		}
 		
-		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\",") {
+		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\",")) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
 			$buffer = trim(preg_replace("/\s+/", " ", $buffer));
 			
