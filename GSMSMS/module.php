@@ -64,7 +64,7 @@ class SIM868GsmSms extends IPSModule
 		
 		$log->LogMessage("Reading meassage ". $Number);
 		
-		$this-SendCommand("AT+CMGR=".$Number);
+		$this-SendATCommand("AT+CMGR=".$Number);
 		$this->WaitForResponse(1000);
 		
 		return true;
@@ -81,7 +81,7 @@ class SIM868GsmSms extends IPSModule
 		return true;
 	}
 	
-	Public function SendCommand(string $Command) {
+	function SendATCOmmand($Command) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
 		if ($this->Lock("ReceivedLock")) 
@@ -101,6 +101,10 @@ class SIM868GsmSms extends IPSModule
 			$log->LogMessage("Timed out waiting for response from parent gateway");
 			return false;
 		}
+	}
+	
+	Public function SendCommand(string $Command) {
+		$this->SendATCommand($Command);
 	}
 	
 	private function WaitForResponse ($Timeout) {
