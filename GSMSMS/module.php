@@ -65,8 +65,7 @@ class SIM868GsmSms extends IPSModule
 		$log->LogMessage("Reading meassage ". $Number);
 		
 		$this->SendATCommand("AT+CMGR=".$Number);
-		$this->WaitForResponse(1000);
-		
+				
 		return true;
 	}
 	
@@ -86,8 +85,11 @@ class SIM868GsmSms extends IPSModule
 		
 		if ($this->Lock("BufferLock")) 
 			SetValueString($this->GetIDForIdent('Buffer'), '');
-		else
+		else {
+			$log->LogMessage("Unable to lock the buffer");
 			return false;
+		}
+			
 		
 		$this->Unlock("BufferLock");
 		
@@ -132,7 +134,7 @@ class SIM868GsmSms extends IPSModule
 	private function Lock($ident){
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		for ($i = 0; $i < 100; $i++){
-			if (IPS_SemaphoreEnter("GSM_" . (string) $this->InstanceID . (string) $ident, 1)){
+			if (IPS_SemaphoreEnter("GSMSMS_" . (string) $this->InstanceID . (string) $ident, 1)){
 				$log->LogMessage("Semaphore ".$ident." is set"); 
 				return true;
 			} else {
@@ -148,7 +150,7 @@ class SIM868GsmSms extends IPSModule
 
     private function Unlock($ident)
     {
-        IPS_SemaphoreLeave("GSM_" . (string) $this->InstanceID . (string) $ident);
+        IPS_SemaphoreLeave("GSMSMS_" . (string) $this->InstanceID . (string) $ident);
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Semaphore ".$ident." is cleared");
     }

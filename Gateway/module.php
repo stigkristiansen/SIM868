@@ -129,7 +129,7 @@ class SIM868Gateway extends IPSModule
 	private function Lock($ident){
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		for ($i = 0; $i < 100; $i++){
-			if (IPS_SemaphoreEnter("GSM_" . (string) $this->InstanceID . (string) $ident, 1)){
+			if (IPS_SemaphoreEnter("GSMGW_" . (string) $this->InstanceID . (string) $ident, 1)){
 				$log->LogMessage("Semaphore ".$ident." is set"); 
 				return true;
 			} else {
@@ -145,7 +145,7 @@ class SIM868Gateway extends IPSModule
 
     private function Unlock($ident)
     {
-        IPS_SemaphoreLeave("GSM_" . (string) $this->InstanceID . (string) $ident);
+        IPS_SemaphoreLeave("GSMGW_" . (string) $this->InstanceID . (string) $ident);
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Semaphore ".$ident." is cleared");
     }
