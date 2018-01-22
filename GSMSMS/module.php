@@ -50,7 +50,7 @@ class SIM868GsmSms extends IPSModule
 		//
 		
 		SetValueString($this->GetIDForIdent('LastReceived'), $buffer);
-		SetValueString($this->GetIDForIdent('Buffer'), "");
+		SetValueString($this->GetIDForIdent('Buffer'), $buffer);
 		
 		$this->Unlock("ReceivedLock"); 
 		
