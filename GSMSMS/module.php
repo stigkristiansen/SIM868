@@ -54,7 +54,7 @@ class SIM868GsmSms extends IPSModule
 		
 		$this->Unlock("ReceivedLock"); 
 		
-		HandleResponse($buffer):
+		HandleResponse($buffer);
 		
 		return true;
     }
