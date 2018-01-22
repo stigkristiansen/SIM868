@@ -54,7 +54,7 @@ class SIM868GsmSms extends IPSModule
 		
 		$this->Unlock("ReceivedLock"); 
 		
-		HandleResponse($buffer);
+		$this->HandleResponse($buffer);
 		
 		return true;
     }
@@ -64,14 +64,14 @@ class SIM868GsmSms extends IPSModule
 		
 		$log->LogMessage("Reading meassage ". $Number);
 		
+		return true;
 	}
 	
 	private function HandleResponse($Response) {
 		if($pos = strpos($Response, "+CMTI: \"SM\"")!==false && $pos===0) {
 			// Incoming SMS messasge
 			// +CMTI: "SM",6
-			ReadMessage(substr($Response, 12));
-			
+			return $this->ReadMessage(substr($Response, 12));
 		}
 	}
 	
