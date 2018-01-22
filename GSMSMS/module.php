@@ -54,8 +54,26 @@ class SIM868GsmSms extends IPSModule
 		
 		$this->Unlock("ReceivedLock"); 
 		
+		HandleResponse($buffer):
+		
 		return true;
     }
+	
+	function ReadSMSMessage($Number) {
+		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
+		
+		$log->LogMessage("Reading meassage ". $Number);
+		
+	}
+	
+	function HandleResponse($Response) {
+		if($pos = strpos($Response, "+CMTI: \"SM\"")!==false && $pos===0) {
+			// Incoming SMS messasge
+			// +CMTI: "SM",6
+			ReadMessage(substr($Response, 12));
+			
+		}
+	}
 	
 	Public function SendCommand(string $Command) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
