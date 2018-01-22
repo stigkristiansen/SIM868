@@ -63,6 +63,7 @@ class SIM868Gateway extends IPSModule
 				break;
 		}
 		
+		$foundComplete = false;
 		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\",")) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
 			$buffer = trim(preg_replace("/\s+/", " ", $buffer));
@@ -71,8 +72,10 @@ class SIM868Gateway extends IPSModule
 						
 			SetValueString($this->GetIDForIdent("LastReceived"), $buffer);
 			$log->LogMessage("Updated variable LastReceived");
-
-			$this->SendDataToChildren(json_encode(Array("DataID" => "{27E8784A-DF07-4142-9C77-281BF411EEB7}", "Buffer" => $buffer)));
+			
+			$foundComplete = true;
+			$completeMessage = $buffer;
+			
 			
 			$buffer = "";
 		} else {
@@ -83,6 +86,9 @@ class SIM868Gateway extends IPSModule
 		SetValueString($idBuffer, $buffer);
 		
 		$this->Unlock("ReceivedLock"); 
+		
+		if($foundComplete)
+			$this->SendDataToChildren(json_encode(Array("DataID" => "{27E8784A-DF07-4142-9C77-281BF411EEB7}", "Buffer" => $completeMessage)));
 				
 		return true;
     }
