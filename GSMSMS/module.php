@@ -72,7 +72,7 @@ class SIM868GsmSms extends IPSModule
 		if($pos!==false && $pos===0) {
 			// Incoming SMS messasge
 			// +CMTI: "SM",6
-			return $this->ReadMessage(substr($Response, 12));
+			return $this->ReadSMSMessage(substr($Response, 12));
 		}
 		
 		return true;
