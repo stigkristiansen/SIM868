@@ -63,6 +63,8 @@ class SIM868Gateway extends IPSModule
 				break;
 		}
 		
+		$log->LogMessage("Last two characters are: ".substr($buffer, strlen($buffer)-2));
+		
 		$foundComplete = false;
 		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\"," && substr($buffer, strlen($buffer)-2) == "\r\n" )) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
