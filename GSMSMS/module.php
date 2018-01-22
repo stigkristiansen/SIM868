@@ -68,11 +68,14 @@ class SIM868GsmSms extends IPSModule
 	}
 	
 	private function HandleResponse($Response) {
-		if($pos = strpos($Response, "+CMTI: \"SM\"")!==false && $pos===0) {
+		$pos = strpos($Response, "+CMTI: \"SM\"");
+		if($pos!==false && $pos===0) {
 			// Incoming SMS messasge
 			// +CMTI: "SM",6
 			return $this->ReadMessage(substr($Response, 12));
 		}
+		
+		return true;
 	}
 	
 	Public function SendCommand(string $Command) {
