@@ -53,7 +53,7 @@ class SIM868Gateway extends IPSModule
 		} else
 			$log->LogMessage("Buffer is locked");
 		
-		$wordsToSearchFor = array("\r\nOK\r\n", "\r\nERROR\r\n", "\r\nNORMAL POWER DOWN\r\n");
+		$wordsToSearchFor = array("\r\nOK\r\n", "\r\n+CMTI: \"SM\",","\r\nERROR\r\n", "\r\nNORMAL POWER DOWN\r\n");
 		foreach ($wordsToSearchFor as $word) {
 			$log->LogMessage("Searching for \"".preg_replace("/(\r\n)+|\r+|\n+/i", " ", $word)."\" in \"".preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer)."\"");
 			$length = strlen($buffer)-strlen($word);
@@ -63,7 +63,7 @@ class SIM868Gateway extends IPSModule
 				break;
 		}
 		
-		if($pos === $length) {
+		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\",") {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
 			$buffer = trim(preg_replace("/\s+/", " ", $buffer));
 			
