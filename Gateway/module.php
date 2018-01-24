@@ -57,7 +57,7 @@ class SIM868Gateway extends IPSModule
 		
 		// <CR><LF>+CMTI: "SM",5<CR><LF>
 		
-		$ret = preg_match('/\r\n\+CMTI: \"(SM|ME)\", [0-9]+\r\n$/i', $str);
+		$ret = preg_match('/\r\n\+CMTI: \"(SM|ME)\", [0-9]+\r\n$/i', $buffer);
 		$log->LogMessage("preg_match returned: ".$ret);
 		
 		$wordsToSearchFor = array("\r\nOK\r\n", "\r\n+CMTI: \"SM\",","\r\nERROR\r\n", "\r\nNORMAL POWER DOWN\r\n");
