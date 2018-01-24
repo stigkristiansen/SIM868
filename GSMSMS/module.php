@@ -33,28 +33,30 @@ class SIM868GsmSms extends IPSModule
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Received data: ".$incomingBuffer); 
 		
-		$idBuffer = $this->GetIDForIdent('Buffer');
-		$buffer = $incomingBuffer;
+		//$idBuffer = $this->GetIDForIdent('Buffer');
+		//$buffer = $incomingBuffer;
 		
-		if (!$this->Lock("ReceivedLock")) { 
-			$log->LogMessage("Buffer is already locked. Aborting message handling!"); 
+		if (!$this->Lock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC")) { 
+			$log->LogMessage("Queue is already locked. Aborting message handling!"); 
             return false;  
 		} else
-			$log->LogMessage("Buffer is locked");
-		
-		// AT+CMGR=1 +CMGR: 1,"",32 06917429000191240A91745960544300008110510233034010E4329D5E0695E5A0B21B442FCFE9 OK 
-		
+			$log->LogMessage("Queue is locked");
 		
 		//
 		// Handle incoming data
 		//
 		
-		SetValueString($this->GetIDForIdent('LastReceived'), $buffer);
+		$ident = $this->GetIDForIdent('LastReceived');
+		$json = GetValueString($ident);
+		$queue = json_decode($json);
+		$queue[] = $incomingBuffer;
+		$json = json_encode($queue);
+		SetValueString($ident, $json);
 		//SetValueString($this->GetIDForIdent('Buffer'), '');
 		
-		$this->Unlock("ReceivedLock"); 
+		$this->Unlock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"); 
 		
-		$this->HandleResponse($buffer);
+		//$this->HandleResponse($buffer);
 		
 		return true;
     }
