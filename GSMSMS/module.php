@@ -83,7 +83,7 @@ class SIM868GsmSms extends IPSModule
 	}
 	
 	private function SendATCommand($Command) {
-		WaitForResponse(1000);
+		$this->WaitForResponse(1000);
 		
 		SetValueBoolean(22640, true);
 		
