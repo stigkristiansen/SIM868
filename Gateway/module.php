@@ -53,6 +53,13 @@ class SIM868Gateway extends IPSModule
 		} else
 			$log->LogMessage("Buffer is locked");
 		
+		// ^\+CMTI: "(SM|ME)", [0-9]+$
+		
+		// <CR><LF>+CMTI: "SM",5<CR><LF>
+		
+		$ret = preg_match('/\r\n\+CMTI: \"(SM|ME)\", [0-9]+\r\n$/i', $str);
+		$log->LogMessage("preg_match returned: ".$ret);
+		
 		$wordsToSearchFor = array("\r\nOK\r\n", "\r\n+CMTI: \"SM\",","\r\nERROR\r\n", "\r\nNORMAL POWER DOWN\r\n");
 		foreach ($wordsToSearchFor as $word) {
 			$log->LogMessage("Searching for \"".preg_replace("/(\r\n)+|\r+|\n+/i", " ", $word)."\" in \"".preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer)."\"");
@@ -66,7 +73,7 @@ class SIM868Gateway extends IPSModule
 		$log->LogMessage("Last two characters are: ".substr($buffer, strlen($buffer)-2));
 		
 		$foundComplete = false;
-		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\"," && substr($buffer, strlen($buffer)-2) == "\r\n" )) {
+		if($pos === $length || ($pos===0 && $word=="\r\n+CMTI: \"SM\"," && substr($buffer, strlen($buffer)-2) === "\r\n" )) {
 			$buffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $buffer);
 			$buffer = trim(preg_replace("/\s+/", " ", $buffer));
 			
