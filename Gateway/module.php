@@ -48,7 +48,7 @@ class SIM868Gateway extends IPSModule
 		$buffer .= $incomingBuffer;
 		
 		if (!$this->Lock("ReceivedLock")) { 
-			$log->LogMessage("Buffer is already locked. Aborting message handling!"); 
+			$log->LogMessage("Buffer is already locked. Aborting messagehandling!"); 
             return false;  
 		} else
 			$log->LogMessage("Buffer is locked");
@@ -85,6 +85,7 @@ class SIM868Gateway extends IPSModule
 			
 			
 			$buffer = "";
+			
 		} else {
 			$incomingBuffer = preg_replace("/(\r\n)+|\r+|\n+/i", " ", $incomingBuffer);
 			$log->LogMessage("Received part of message: ", $incomingBuffer);
@@ -94,9 +95,12 @@ class SIM868Gateway extends IPSModule
 		
 		$this->Unlock("ReceivedLock"); 
 		
-		if($foundComplete)
+		if($foundComplete) {
 			$this->SendDataToChildren(json_encode(Array("DataID" => "{27E8784A-DF07-4142-9C77-281BF411EEB7}", "Buffer" => $completeMessage)));
-				
+
+			
+		}
+		
 		return true;
     }
 	

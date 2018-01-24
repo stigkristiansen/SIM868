@@ -27,6 +27,8 @@ class SIM868GsmSms extends IPSModule
     }
 
     public function ReceiveData($JSONString) {
+		$this->Unlock("SendingState");
+
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
 				
@@ -92,17 +94,19 @@ class SIM868GsmSms extends IPSModule
 	private function SendATCommand($Command) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		if ($this->Lock("BufferLock")) 
+		if($this->Lock("SendingState")) {
+		
+		/*if ($this->Lock("BufferLock")) 
 			SetValueString($this->GetIDForIdent('Buffer'), '');
 		else {
 			$log->LogMessage("Unable to lock the buffer");
 			return false;
 		}
-			
-		$log->LogMessage("Sending command \"".$Command."\"to parent gateway and waiting for response...");
-		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
+		*/	
+			$log->LogMessage("Sending command \"".$Command."\"to parent gateway...");
+			$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	
-		$this->Unlock("BufferLock");
+		//$this->Unlock("BufferLock");
 		
 		/*if($this->WaitForResponse(1000)) {
 			$log->LogMessage("Got response back from parent gateway");
@@ -111,6 +115,8 @@ class SIM868GsmSms extends IPSModule
 			$log->LogMessage("Timed out waiting for response from parent gateway");
 			return false;
 		}*/
+		
+		}
 	}
 	
 	Public function SendCommand(string $Command) {
