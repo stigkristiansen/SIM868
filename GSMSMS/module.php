@@ -66,7 +66,7 @@ class SIM868GsmSms extends IPSModule
 		
 		$this->SendATCommand("AT+CMGR=".$Number);
 		
-		$this->SendATCommand("AT+CMGD=".$Number);
+		//$this->SendATCommand("AT+CMGD=".$Number);
 				
 		return true;
 	}

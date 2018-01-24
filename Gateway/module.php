@@ -53,12 +53,10 @@ class SIM868Gateway extends IPSModule
 		} else
 			$log->LogMessage("Buffer is locked");
 		
-		// ^\+CMTI: "(SM|ME)", [0-9]+$
-		
-		// <CR><LF>+CMTI: "SM",5<CR><LF>
-		
+		$log->LogMessage("Buffer is: ".$buffer);
 		$ret = preg_match('/\r\n\+CMTI: \"(SM|ME)\", [0-9]+\r\n$/i', $buffer);
 		$log->LogMessage("preg_match returned: ".$ret);
+		
 		
 		$wordsToSearchFor = array("\r\nOK\r\n", "\r\n+CMTI: \"SM\",","\r\nERROR\r\n", "\r\nNORMAL POWER DOWN\r\n");
 		foreach ($wordsToSearchFor as $word) {
