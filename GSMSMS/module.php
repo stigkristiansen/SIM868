@@ -52,6 +52,7 @@ class SIM868GsmSms extends IPSModule
 		$queue[] = $incomingBuffer;
 		$json = json_encode($queue);
 		SetValueString($ident, $json);
+		$log->LogMessage("New queue is ".$json);
 		//SetValueString($this->GetIDForIdent('Buffer'), '');
 		
 		$this->Unlock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"); 
