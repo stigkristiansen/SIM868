@@ -27,8 +27,8 @@ class SIM868GsmSms extends IPSModule
     }
 
     public function ReceiveData($JSONString) {
-		$this->Unlock("SendingState");
-
+		SetValueBoolean (22640, false);
+		
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
 				
@@ -50,8 +50,7 @@ class SIM868GsmSms extends IPSModule
 		$log->LogMessage("New queue is ".$json);
 				
 		$this->Unlock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"); 
-		SetValueBoolean (22640, false);
-		
+				
 		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => (string) $id);
 		
 		IPS_RunScriptEx(29268, $parameters);
