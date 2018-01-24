@@ -59,6 +59,10 @@ class SIM868GsmSms extends IPSModule
 		
 		//$this->HandleResponse($buffer);
 		
+		$parameters = Array("SemaphoreIdent" => BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => string ($ident));
+		
+		IPS_RunScriptEx(29268, $parameters);
+		
 		return true;
     }
 	
@@ -95,11 +99,11 @@ class SIM868GsmSms extends IPSModule
 			return false;
 		}
 			
-		$this->Unlock("BufferLock");
-		
 		$log->LogMessage("Sending command \"".$Command."\"to parent gateway and waiting for response...");
 		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	
+		$this->Unlock("BufferLock");
+		
 		/*if($this->WaitForResponse(1000)) {
 			$log->LogMessage("Got response back from parent gateway");
 			return true;
@@ -135,10 +139,14 @@ class SIM868GsmSms extends IPSModule
 		return false;
 	}
 	
+	private function BuildSemaphoreName($ident) {
+		return "GSMSMS_" . (string) $this->InstanceID . (string) $ident;
+	}
+	
 	private function Lock($ident){
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		for ($i = 0; $i < 100; $i++){
-			if (IPS_SemaphoreEnter("GSMSMS_" . (string) $this->InstanceID . (string) $ident, 1)){
+			if (IPS_SemaphoreEnter($this->BuildSemaphoreName($ident), 1)){
 				$log->LogMessage("Semaphore ".$ident." is set"); 
 				return true;
 			} else {
@@ -154,7 +162,7 @@ class SIM868GsmSms extends IPSModule
 
     private function Unlock($ident)
     {
-        IPS_SemaphoreLeave("GSMSMS_" . (string) $this->InstanceID . (string) $ident);
+        IPS_SemaphoreLeave($this->BuildSemaphoreName($ident));
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Semaphore ".$ident." is cleared");
     }
