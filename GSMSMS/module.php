@@ -50,7 +50,7 @@ class SIM868GsmSms extends IPSModule
 		//
 		
 		SetValueString($this->GetIDForIdent('LastReceived'), $buffer);
-		SetValueString($this->GetIDForIdent('Buffer'), $buffer);
+		//SetValueString($this->GetIDForIdent('Buffer'), '');
 		
 		$this->Unlock("ReceivedLock"); 
 		
@@ -62,7 +62,7 @@ class SIM868GsmSms extends IPSModule
 	private function ReadSMSMessage($Number) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		//$log->LogMessage("Reading meassage ". $Number);
+		$log->LogMessage("Reading meassage ". $Number);
 		
 		//$this->SendATCommand("AT+CMGR=".$Number);
 		
@@ -94,16 +94,16 @@ class SIM868GsmSms extends IPSModule
 			
 		$this->Unlock("BufferLock");
 		
-		$log->LogMessage("Sending command to parent gateway and waiting for response...");
+		$log->LogMessage("Sending command \"".$Command."\"to parent gateway and waiting for response...");
 		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	
-		if($this->WaitForResponse(1000)) {
+		/*if($this->WaitForResponse(1000)) {
 			$log->LogMessage("Got response back from parent gateway");
 			return true;
 		} else {
 			$log->LogMessage("Timed out waiting for response from parent gateway");
 			return false;
-		}
+		}*/
 	}
 	
 	Public function SendCommand(string $Command) {
