@@ -59,7 +59,7 @@ class SIM868GsmSms extends IPSModule
 		
 		//$this->HandleResponse($buffer);
 		
-		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => string ($ident));
+		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => (string) $ident);
 		
 		IPS_RunScriptEx(29268, $parameters);
 		
