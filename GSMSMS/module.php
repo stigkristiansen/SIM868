@@ -34,34 +34,25 @@ class SIM868GsmSms extends IPSModule
 				
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Received data: ".$incomingBuffer); 
-		
-		//$idBuffer = $this->GetIDForIdent('Buffer');
-		//$buffer = $incomingBuffer;
-		
+				
 		if (!$this->Lock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC")) { 
 			$log->LogMessage("Queue is already locked. Aborting message handling!"); 
             return false;  
 		} else
 			$log->LogMessage("Queue is locked");
 		
-		//
-		// Handle incoming data
-		//
-		
-		$ident = $this->GetIDForIdent('LastReceived');
-		$json = GetValueString($ident);
+		$id = $this->GetIDForIdent('LastReceived');
+		$json = GetValueString($id);
 		$queue = json_decode($json);
 		$queue[] = $incomingBuffer;
 		$json = json_encode($queue);
-		SetValueString($ident, $json);
+		SetValueString($id, $json);
 		$log->LogMessage("New queue is ".$json);
-		//SetValueString($this->GetIDForIdent('Buffer'), '');
-		
+				
 		$this->Unlock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"); 
+		SetValueBoolean (22640, false);
 		
-		//$this->HandleResponse($buffer);
-		
-		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => (string) $ident);
+		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => (string) $id);
 		
 		IPS_RunScriptEx(29268, $parameters);
 		
@@ -92,31 +83,15 @@ class SIM868GsmSms extends IPSModule
 	}
 	
 	private function SendATCommand($Command) {
+		WaitForResponse(1000);
+		
+		SetValueBoolean(22640, true);
+		
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		if($this->Lock("SendingState")) {
-		
-		/*if ($this->Lock("BufferLock")) 
-			SetValueString($this->GetIDForIdent('Buffer'), '');
-		else {
-			$log->LogMessage("Unable to lock the buffer");
-			return false;
-		}
-		*/	
-			$log->LogMessage("Sending command \"".$Command."\"to parent gateway...");
-			$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
+		$log->LogMessage("Sending command \"".$Command."\"to parent gateway...");
+		$this->SendDataToParent(json_encode(Array("DataID" => "{51C4B053-9596-46BE-A143-E3086636E782}", "Buffer" => $Command)));
 	
-		//$this->Unlock("BufferLock");
-		
-		/*if($this->WaitForResponse(1000)) {
-			$log->LogMessage("Got response back from parent gateway");
-			return true;
-		} else {
-			$log->LogMessage("Timed out waiting for response from parent gateway");
-			return false;
-		}*/
-		
-		}
 	}
 	
 	Public function SendCommand(string $Command) {
@@ -126,18 +101,18 @@ class SIM868GsmSms extends IPSModule
 	private function WaitForResponse ($Timeout) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		$idBuffer = $this->GetIDForIdent('Buffer');
+		$idBuffer = 22640;//$this->GetIDForIdent('Buffer');
 		
 		$response=""; 
 		$iteration = intval($Timeout/100);
  		for($x=0;$x<$iteration;$x++) { 
- 			$response = GetValueString($idBuffer); 
+ 			$response = GetValueBoolean($idBuffer); 
  			 
- 			if(strlen($response)>0) { 
- 				$log->LogMessage("Response from gateway: ".$response); 
+ 			if(!$response) { 
+ 				$log->LogMessage("A sending was completed"); 
  				return true; 
  			} else 
- 				$log->LogMessage("Still waiting..."); 
+ 				$log->LogMessage("Sending already in use. Waiting..."); 
  				 
  			IPS_Sleep(100); 
  		} 
