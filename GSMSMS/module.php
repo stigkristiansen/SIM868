@@ -62,9 +62,9 @@ class SIM868GsmSms extends IPSModule
 	private function ReadSMSMessage($Number) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		$log->LogMessage("Reading meassage ". $Number);
+		//$log->LogMessage("Reading meassage ". $Number);
 		
-		$this->SendATCommand("AT+CMGR=".$Number);
+		//$this->SendATCommand("AT+CMGR=".$Number);
 		
 		//$this->SendATCommand("AT+CMGD=".$Number);
 				
