@@ -20,7 +20,7 @@ class SIM868GsmSms extends IPSModule
         //$this->RegisterVariableString("LastSendt", "LastSendt");
         $this->RegisterVariableString("Queue", "Queue");
 		//$this->RegisterVariableString("Buffer", "Buffer");
-		$this->RegisterVariableString("In Progress", "InProgress");
+		$this->RegisterVariableString("InProgress", "InProgress");
         
         //IPS_SetHidden($this->GetIDForIdent('LastSendt'), true);
         IPS_SetHidden($this->GetIDForIdent('Queue'), true);
