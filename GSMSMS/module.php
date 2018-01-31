@@ -5,53 +5,95 @@ require_once(__DIR__ . "/../logging.php");
 class SIM868GsmSms extends IPSModule
 {
     
-    public function Create()
-    {
+    public function Create(){
         parent::Create();
-        $this->RequireParent("{B969177D-4A13-40FB-8006-3BF7557FA5F6}");
+        
+		$this->RequireParent("{B969177D-4A13-40FB-8006-3BF7557FA5F6}");
         
         $this->RegisterPropertyBoolean ("log", true);
-		
-    }
+		$this->RegisterPropertyString("TreeData", "");
+	}
 
     public function ApplyChanges(){
         parent::ApplyChanges();
         
-        $this->RegisterVariableString("LastSendt", "LastSendt");
-        $this->RegisterVariableString("LastReceived", "LastReceived");
-		$this->RegisterVariableString("Buffer", "Buffer");
+        //$this->RegisterVariableString("LastSendt", "LastSendt");
+        $this->RegisterVariableString("Queue", "Queue");
+		//$this->RegisterVariableString("Buffer", "Buffer");
+		$this->RegisterVariableString("In Progress", "InProgress");
         
-        IPS_SetHidden($this->GetIDForIdent('LastSendt'), true);
-        IPS_SetHidden($this->GetIDForIdent('LastReceived'), true);
-		IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
+        //IPS_SetHidden($this->GetIDForIdent('LastSendt'), true);
+        IPS_SetHidden($this->GetIDForIdent('Queue'), true);
+		//IPS_SetHidden($this->GetIDForIdent('Buffer'), true);
+		IPS_SetHidden($this->GetIDForIdent('InProgress'), true);
+		
+		// Create Script
     }
+	
+	public function GetConfigurationForm(){
+			
+		$data = json_decode(file_get_contents(__DIR__ . "/form.json"));
+		
+		//Only add default element if we do not have anything in persistence
+		if($this->ReadPropertyString("TreeData") == "") {			
+			$data->elements[0]->values[] = Array(
+				"instanceID" => 12435,
+				"name" => "ABCD",
+				"state" => "OK!",
+				"temperature" => 23.31,
+				"rowColor" => "#ff0000"
+			);
+		} else {
+			//Annotate existing elements
+			$treeData = json_decode($this->ReadPropertyString("TreeData"));
+			foreach($treeData as $treeRow) {
+				//We only need to add annotations. Remaining data is merged from persistance automatically.
+				//Order is determinted by the order of array elements
+				if(IPS_ObjectExists($treeRow->instanceID)) {
+					$data->elements[0]->values[] = Array(
+						"name" => IPS_GetName($treeRow->instanceID),
+						"state" => "OK!"
+					);
+				} else {
+					$data->elements[0]->values[] = Array(
+						"name" => "Not found!",
+						"state" => "FAIL!",
+						"rowColor" => "#ff0000"
+					);
+				}						
+			}			
+		}
+		
+		return json_encode($data);
+	
+	}	
 
     public function ReceiveData($JSONString) {
-		SetValueBoolean (22640, false);
-		
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
 				
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		$log->LogMessage("Received data: ".$incomingBuffer); 
 				
-		if (!$this->Lock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC")) { 
+		if (!$this->Lock("ReceivedQueue")) { 
 			$log->LogMessage("Queue is already locked. Aborting message handling!"); 
             return false;  
 		} else
 			$log->LogMessage("Queue is locked");
 		
-		$id = $this->GetIDForIdent('LastReceived');
-		$json = GetValueString($id);
+		$idQueue = $this->GetIDForIdent('Queue');
+		$json = GetValueString($idQueue);
 		$queue = json_decode($json);
 		$queue[] = $incomingBuffer;
 		$json = json_encode($queue);
-		SetValueString($id, $json);
+		SetValueString($idQueue, $json);
 		$log->LogMessage("New queue is ".$json);
 				
-		$this->Unlock("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"); 
+		$this->Unlock("ReceivedQueue"); 
 				
-		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue_84D523A8-DD46-4AA6-9E2D-3C977B670FCC"), "QueueId" => (string) $id);
+		$parameters = Array("SemaphoreIdent" => $this->BuildSemaphoreName("ReceivedQueue"), "QueueId" => (string) $idQueue);
+		
+		SetValueBoolean($this->GetIDForIdent('InProgress'), false);
 		
 		IPS_RunScriptEx(29268, $parameters);
 		
@@ -61,7 +103,7 @@ class SIM868GsmSms extends IPSModule
 	private function SendATCommand($Command) {
 		$this->WaitForResponse(1000);
 		
-		SetValueBoolean(22640, true);
+		SetValueBoolean($this->GetIDForIdent('InProgress'), true);
 		
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
@@ -77,12 +119,12 @@ class SIM868GsmSms extends IPSModule
 	private function WaitForResponse ($Timeout) {
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		
-		$idBuffer = 22640;//$this->GetIDForIdent('Buffer');
+		$idInProgress = $this->GetIDForIdent('InProgress');//$this->GetIDForIdent('Buffer');
 		
 		$response=""; 
 		$iteration = intval($Timeout/100);
  		for($x=0;$x<$iteration;$x++) { 
- 			$response = GetValueBoolean($idBuffer); 
+ 			$response = GetValueBoolean($idInProgress); 
  			 
  			if(!$response) { 
  				$log->LogMessage("A sending was completed"); 
@@ -96,14 +138,14 @@ class SIM868GsmSms extends IPSModule
 		return false;
 	}
 	
-	private function BuildSemaphoreName($ident) {
-		return "GSMSMS_" . (string) $this->InstanceID . (string) $ident;
+	private function BuildSemaphoreName($Ident) {
+		return "GSMSMS_" . (string) $this->InstanceID . (string) $Ident;
 	}
 	
-	private function Lock($ident){
+	private function Lock($Ident){
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
 		for ($i = 0; $i < 100; $i++){
-			if (IPS_SemaphoreEnter($this->BuildSemaphoreName($ident), 1)){
+			if (IPS_SemaphoreEnter($this->BuildSemaphoreName($Ident), 1)){
 				$log->LogMessage("Semaphore ".$ident." is set"); 
 				return true;
 			} else {
@@ -117,11 +159,11 @@ class SIM868GsmSms extends IPSModule
         return false;
     }
 
-    private function Unlock($ident)
+    private function Unlock($Ident)
     {
-        IPS_SemaphoreLeave($this->BuildSemaphoreName($ident));
+        IPS_SemaphoreLeave($this->BuildSemaphoreName($Ident));
 		$log = new Logging($this->ReadPropertyBoolean("log"), IPS_Getname($this->InstanceID));
-		$log->LogMessage("Semaphore ".$ident." is cleared");
+		$log->LogMessage("Semaphore ".$Ident." is cleared");
     }
 	
 	private function HasActiveParent(){
