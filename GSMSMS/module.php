@@ -33,7 +33,7 @@ class SIM868GsmSms extends IPSModule
 	public function GetSMSCommands(){
 		return $this->ReadPropertyString("SMSCommands");
 	}
-*/
+
     public function ReceiveData($JSONString) {
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
