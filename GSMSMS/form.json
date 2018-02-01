@@ -3,42 +3,31 @@
     [
 		{
 			"type": "List",
-			"name": "TreeData",
-			"caption": "Devices",
+			"name": "SMSCommands",
+			"caption": "SMS Commands",
 			"rowCount": 5,
 			"add": true,
 			"delete": true,
 			"sort": {
-				"column": "name",
+				"column": "Command",
 				"direction": "ascending"
 			},
 			"columns": [
 				{
-					"label": "InstanceID",
-					"name": "instanceID", 
+					"label": "Script",
+					"name": "Script", 
 					"width": "75px",
 					"add": 0,
 					"edit": {
-						"type": "SelectInstance"
+						"type": "SelectScript"
 					}
 				}, {
-					"label": "Name",
+					"label": "Command",
 					"name": "name",
 					"width": "auto",
-					"add": ""
-				}, {
-					"label": "State",
-					"name": "state",
-					"width": "40px",					
-					"add": "New!"
-				}, {
-					"label": "Temperature",
-					"name": "temperature",
-					"width": "75px",					
-					"add": 20.0,
+					"add": "",
 					"edit": {
-						"type": "NumberSpinner",
-						"digits": 2
+						"type": "ValidationTextBox"
 					}
 				}
 			],

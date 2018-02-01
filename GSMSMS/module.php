@@ -11,7 +11,7 @@ class SIM868GsmSms extends IPSModule
 		$this->RequireParent("{B969177D-4A13-40FB-8006-3BF7557FA5F6}");
         
         $this->RegisterPropertyBoolean ("log", true);
-		$this->RegisterPropertyString("TreeData", "");
+		$this->RegisterPropertyString("SMSCommands", "");
 	}
 
     public function ApplyChanges(){
