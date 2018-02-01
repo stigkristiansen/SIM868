@@ -30,7 +30,7 @@ class SIM868GsmSms extends IPSModule
 		// Create Script
     }
 	
-	public function GetConfigurationForm(){
+	/*public function GetConfigurationForm(){
 			
 		$data = json_decode(file_get_contents(__DIR__ . "/form.json"));
 		
@@ -67,7 +67,7 @@ class SIM868GsmSms extends IPSModule
 		return json_encode($data);
 	
 	}	
-
+*/
     public function ReceiveData($JSONString) {
 		$incomingData = json_decode($JSONString);
 		$incomingBuffer = utf8_decode($incomingData->Buffer);
